@@ -21,6 +21,11 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        // Get the API keys from properties
+        buildConfigField("String", "NIMBLE_KEY", project.findProperty("nimbleKey") as String)
+        buildConfigField("String", "NIMBLE_SECRET", project.findProperty("nimbleSecret") as String)
+        buildConfigField("String", "NIMBLE_BASE_URL", project.findProperty("nimbleBaseUrl") as String)
     }
 
     buildTypes {
@@ -105,6 +110,28 @@ dependencies {
 
     // Coroutines
     implementation(libs.coroutines.android)
+
+    // Paging
+    implementation(libs.androidx.paging3.common)
+    implementation(libs.androidx.paging3.runtime)
+    implementation(libs.androidx.paging3.compose)
+
+    // DataStore
+    implementation(libs.androidx.datastore.preferences)
+
+    // OkHttp3
+    implementation(libs.okhttp.logging.interceptor)
+
+    // Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.retrofit.converter.scalars)
+
+    // Gson
+    api(libs.gson)
+
+    // desugar
+    coreLibraryDesugaring(libs.desugar)
 
     // Timber
     api(libs.timber)
