@@ -1,5 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Theme.NimbleSurvey" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Base.Theme.NimbleSurvey" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">true</item>
+    </style>
+
+    <!-- Allows us to override platform level specific attributes in their
+     respective values-vXX folder. -->
+    <style name="PlatformAdjusted.Theme.NimbleSurvey" parent="Base.Theme.NimbleSurvey">
+        <item name="android:statusBarColor">@color/black30</item>
+    </style>
+
+    <style name="Theme.NimbleSurvey" parent="PlatformAdjusted.Theme.NimbleSurvey" />
+
+    <style name="Base.Theme.Splash" parent="Theme.SplashScreen">
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">true</item>
+    </style>
+
+    <style name="Theme.NimbleSurvey.Splash" parent="Base.Theme.Splash">
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.NimbleSurvey</item>
+    </style>
 </resources>

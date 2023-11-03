@@ -4,6 +4,7 @@ data class ApiResponse <T>(
     val data: T?,
 )
 
+// just in case pagination is needed todo: remove if not needed
 data class PaginatedApiResponse <T>(
     val data: T?,
     val meta: Meta?
