@@ -1,12 +1,12 @@
 package com.erapp.nimblesurvey.data.models
 
-
 import com.erapp.nimblesurvey.BuildConfig
+import com.erapp.nimblesurvey.utils.GrantTypes
 import com.google.gson.annotations.SerializedName
 
 data class Login(
     @SerializedName("grant_type")
-    val grantType: String = "password",
+    val grantType: String = GrantTypes.PASSWORD.value,
     @SerializedName("email")
     val email: String,
     @SerializedName("password")

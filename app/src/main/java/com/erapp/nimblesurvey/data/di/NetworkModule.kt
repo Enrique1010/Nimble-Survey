@@ -6,6 +6,7 @@ import com.erapp.nimblesurvey.data.api.NetworkResponseAdapterFactory
 import com.erapp.nimblesurvey.data.api.NimbleSurveyApiService
 import com.erapp.nimblesurvey.data.datastore.DataStorePreferencesRepository
 import com.erapp.nimblesurvey.utils.NotRequiredAuthorization
+import com.erapp.nimblesurvey.utils.TokenAuthenticator
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
@@ -52,11 +53,13 @@ object NetworkModule {
         httpLoggingInterceptor: Interceptor,
         cache: Cache,
         preferences: DataStorePreferencesRepository,
+        tokenAuthenticator: TokenAuthenticator
     ): OkHttpClient {
         val builder = OkHttpClient.Builder()
 
         builder.apply {
             cache(cache)
+            authenticator(tokenAuthenticator)
             addInterceptor(Interceptor { chain ->
                 val originalRequest = chain.request()
                 val method = originalRequest.tag(Invocation::class.java)!!.method()
@@ -65,7 +68,7 @@ object NetworkModule {
                     chain.proceed(originalRequest)
                 } else {
                     val token = runBlocking(Dispatchers.IO) {
-                        // todo: get token from preferences
+                        "wXm7Q1NmteogShLsO8Tk64zJmB34OSSOfA_iG2uj1Lk"
                     }
                     val request = originalRequest.newBuilder()
                         .addHeader(AUTHORIZATION_HEADER, "Bearer $token")

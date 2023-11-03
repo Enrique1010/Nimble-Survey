@@ -99,6 +99,7 @@ dependencies {
     debugImplementation(libs.androidx.compose.test.manifest)
     implementation(libs.androidx.compose.extended.icons)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.coil)
 
     // Hilt
     implementation(libs.hilt.android)
@@ -132,6 +133,9 @@ dependencies {
 
     // desugar
     coreLibraryDesugaring(libs.desugar)
+
+    // Work
+    implementation(libs.androidx.work.runtime)
 
     // Timber
     api(libs.timber)

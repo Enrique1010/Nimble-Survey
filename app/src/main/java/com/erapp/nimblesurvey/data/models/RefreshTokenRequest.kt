@@ -1,12 +1,12 @@
 package com.erapp.nimblesurvey.data.models
 
-
 import com.erapp.nimblesurvey.BuildConfig
+import com.erapp.nimblesurvey.utils.GrantTypes
 import com.google.gson.annotations.SerializedName
 
 data class RefreshTokenRequest(
     @SerializedName("grant_type")
-    val grantType: String = "refresh_token",
+    val grantType: String = GrantTypes.REFRESH.value,
     @SerializedName("refresh_token")
     val refreshToken: String,
     @SerializedName("client_id")

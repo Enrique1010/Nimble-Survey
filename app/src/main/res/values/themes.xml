@@ -3,12 +3,15 @@
 
     <style name="Base.Theme.NimbleSurvey" parent="android:Theme.Material.NoActionBar">
         <item name="android:windowLightNavigationBar" tools:targetApi="27">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
     <!-- Allows us to override platform level specific attributes in their
      respective values-vXX folder. -->
     <style name="PlatformAdjusted.Theme.NimbleSurvey" parent="Base.Theme.NimbleSurvey">
-        <item name="android:statusBarColor">@color/black30</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
     <style name="Theme.NimbleSurvey" parent="PlatformAdjusted.Theme.NimbleSurvey" />
@@ -18,7 +21,8 @@
     </style>
 
     <style name="Theme.NimbleSurvey.Splash" parent="Base.Theme.Splash">
-        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
         <item name="postSplashScreenTheme">@style/Theme.NimbleSurvey</item>
+        <item name="windowSplashScreenBackground">@color/black</item>
     </style>
 </resources>

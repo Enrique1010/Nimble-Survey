@@ -2,6 +2,7 @@ package com.erapp.nimblesurvey.navigation
 
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.erapp.nimblesurvey.utils.NavigationDestinations
 
 /**
  *
@@ -30,6 +31,12 @@ sealed class NavigationHelper(
     }
 
     //** here you can add your destination objects **//
+    // auth
+    data object LoginScreen : NavigationHelper(NavigationDestinations.LOGIN_SCREEN)
+    data object ForgotPasswordScreen : NavigationHelper(NavigationDestinations.FORGOT_PASSWORD_SCREEN)
+    // home
+    data object HomeScreen : NavigationHelper(NavigationDestinations.HOME_SCREEN)
+    data object SurveyScreen : NavigationHelper(NavigationDestinations.SURVEY_DETAILS_SCREEN)
 }
 
 enum class NavArgs(
