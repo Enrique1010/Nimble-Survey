@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -15,6 +16,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.erapp.nimblesurvey.ui.theme.LocalNimbleColors
 import kotlinx.coroutines.delay
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -70,9 +72,11 @@ fun LoadingDialog() {
         Card(
             shape = RoundedCornerShape(16.dp),
             elevation = 0.dp,
+            backgroundColor = MaterialTheme.colorScheme.primary,
         ) {
             CircularProgressIndicator(
                 strokeCap = StrokeCap.Round,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.padding(16.dp)
             )
         }

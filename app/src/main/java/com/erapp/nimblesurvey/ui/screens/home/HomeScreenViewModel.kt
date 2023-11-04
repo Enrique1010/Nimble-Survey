@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.erapp.nimblesurvey.data.NimbleAuthRepository
 import com.erapp.nimblesurvey.data.NimbleSurveyRepository
 import com.erapp.nimblesurvey.data.models.Survey
 import com.erapp.nimblesurvey.data.result.Result
@@ -14,13 +15,31 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
-    private val surveyRepository: NimbleSurveyRepository
+    private val surveyRepository: NimbleSurveyRepository,
+    private val authRepository: NimbleAuthRepository
 ): ViewModel() {
 
     var homeScreenData by mutableStateOf(HomeScreenData())
     var homeScreenState: HomeScreenState by mutableStateOf(HomeScreenState.Loading)
 
-    init { getSurveys() }
+    init {
+        getUserProfile()
+        getSurveys()
+    }
+
+    private fun getUserProfile() {
+        viewModelScope.launch {
+            when(val result = authRepository.getProfile()) {
+                is Result.Success -> {
+                    homeScreenData = homeScreenData.copy(
+                        userName = result.data?.profileAttributes?.name.orEmpty(),
+                        avatarUrl = result.data?.profileAttributes?.avatarUrl.orEmpty()
+                    )
+                }
+                else -> Unit
+            }
+        }
+    }
 
     private fun getSurveys() {
         viewModelScope.launch {
@@ -59,6 +78,8 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     data class HomeScreenData(
+        val userName: String = "",
+        val avatarUrl: String = "",
         val surveys: List<Survey> = emptyList()
     )
 }

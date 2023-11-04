@@ -2,10 +2,12 @@ package com.erapp.nimblesurvey.ui.screens.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,53 +16,68 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.IconButton
+import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.erapp.nimblesurvey.R
-import com.erapp.nimblesurvey.data.models.Survey
 import com.erapp.nimblesurvey.ui.components.BottomLoaderShimmer
 import com.erapp.nimblesurvey.ui.components.CarouselDots
 import com.erapp.nimblesurvey.ui.components.ScreenWithMessage
 import com.erapp.nimblesurvey.ui.components.TopLoaderShimmer
+import com.erapp.nimblesurvey.ui.screens.home.HomeScreenViewModel.HomeScreenData
 import com.erapp.nimblesurvey.ui.screens.home.HomeScreenViewModel.HomeScreenEvent
 import com.erapp.nimblesurvey.ui.screens.home.HomeScreenViewModel.HomeScreenState
+import com.erapp.nimblesurvey.ui.theme.LocalNimbleColors
 import com.erapp.nimblesurvey.utils.toNamedDateFormat
 import com.erapp.nimblesurvey.utils.toTimeAgo
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
-    surveys: List<Survey> = emptyList(),
+    homeScreenData: HomeScreenData,
     homeScreenState: HomeScreenState,
     onEvent: (HomeScreenEvent) -> Unit = {},
-    onSurveyButtonPressed: () -> Unit = {}
+    onSurveyButtonPressed: () -> Unit = {},
+    onLogout: () -> Unit = {}
 ) {
     val pagerState = rememberPagerState(
         initialPage = 0
     ) {
-        surveys.size
+        homeScreenData.surveys.size
     }
+    val scope = rememberCoroutineScope()
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     Box {
         when (homeScreenState) {
@@ -85,28 +102,115 @@ fun HomeScreen(
             }
 
             HomeScreenState.Success -> {
-                Box {
-                    HorizontalPager(
-                        state = pagerState
-                    ) { page ->
-                        val survey = surveys.getOrNull(page)
-                        CarouselCard(
-                            name = survey?.attributes?.title.orEmpty(),
-                            description = survey?.attributes?.description.orEmpty(),
-                            imageUrl = survey?.attributes?.coverImageUrl.orEmpty(),
-                            date = survey?.attributes?.createdAt.orEmpty(),
-                            goToDetails = onSurveyButtonPressed
+                ModalNavigationDrawer(
+                    gesturesEnabled = true,
+                    drawerState = drawerState,
+                    drawerContent = {
+                        ProfileDrawerPage(
+                            userName = homeScreenData.userName,
+                            avatarUrl = homeScreenData.avatarUrl,
+                            onLogout = onLogout
                         )
                     }
-                    CarouselDots(
+                ) {
+                    Box {
+                        HorizontalPager(
+                            state = pagerState
+                        ) { page ->
+                            val survey = homeScreenData.surveys.getOrNull(page)
+                            CarouselCard(
+                                name = survey?.attributes?.title.orEmpty(),
+                                description = survey?.attributes?.description.orEmpty(),
+                                imageUrl = survey?.attributes?.coverImageUrl.orEmpty(),
+                                date = survey?.attributes?.createdAt.orEmpty(),
+                                avatarUrl = homeScreenData.avatarUrl,
+                                goToDetails = onSurveyButtonPressed,
+                                openProfile = {
+                                    scope.launch {
+                                        drawerState.open()
+                                    }
+                                }
+                            )
+                        }
+                        CarouselDots(
+                            modifier = Modifier
+                                .align(Alignment.BottomStart)
+                                .padding(bottom = 148.dp, start = 16.dp),
+                            dotsCount = homeScreenData.surveys.size,
+                            currentPage = pagerState.currentPage
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ProfileDrawerPage(
+    userName: String = "",
+    avatarUrl: String = "",
+    onLogout: () -> Unit = {}
+) {
+    Surface(
+        color = MaterialTheme.colorScheme.surface
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .fillMaxWidth(.7f)
+                .systemBarsPadding(),
+            verticalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Column {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = userName.ifEmpty { "UserName" },
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                    )
+                    AsyncImage(
                         modifier = Modifier
-                            .align(Alignment.BottomStart)
-                            .padding(bottom = 148.dp, start = 16.dp),
-                        dotsCount = surveys.size,
-                        currentPage = pagerState.currentPage
+                            .size(40.dp)
+                            .clip(CircleShape),
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(avatarUrl)
+                            .crossfade(true)
+                            .error(R.drawable.ic_launcher_foreground)
+                            .build(),
+                        contentDescription = null
+                    )
+                }
+                Divider()
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(onClick = onLogout)
+                ) {
+                    Text(
+                        modifier = Modifier.padding(16.dp),
+                        text = "Logout",
+                        color = LocalNimbleColors.current.nimbleLightGrey,
                     )
                 }
             }
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                text = "version 1.0.0.0",
+                style = MaterialTheme.typography.labelSmall.copy(
+                    color = LocalNimbleColors.current.nimbleLightGrey,
+                    textAlign = TextAlign.Start
+                ),
+            )
         }
     }
 }
@@ -147,6 +251,8 @@ fun CarouselCard(
     description: String,
     date: String,
     imageUrl: String,
+    avatarUrl: String = "",
+    openProfile: () -> Unit = {},
     goToDetails: () -> Unit = {}
 ) {
     Box {
@@ -168,7 +274,7 @@ fun CarouselCard(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(color = Color.Black)
+                        .background(color = MaterialTheme.colorScheme.secondary)
                 )
             },
             contentDescription = null,
@@ -181,9 +287,9 @@ fun CarouselCard(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            Color.DarkGray,
-                            Color.Black,
-                            Color.Black
+                            LocalNimbleColors.current.nimbleDarkerGrey,
+                            MaterialTheme.colorScheme.secondary,
+                            MaterialTheme.colorScheme.secondary
                         )
                     ),
                     alpha = 0.7f
@@ -205,23 +311,30 @@ fun CarouselCard(
                     Text(
                         text = date.toNamedDateFormat(), //"EEEE, MMMM dd"
                         style = MaterialTheme.typography.bodyLarge.copy(
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.primary,
                         ),
                     )
                     Text(
                         text = date.toTimeAgo(),
                         style = MaterialTheme.typography.titleLarge.copy(
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold
                         ),
                     )
                 }
-                Icon(
-                    modifier = Modifier.size(36.dp),
-                    imageVector = Icons.Default.AccountCircle,
-                    tint = Color.White,
-                    contentDescription = null
-                )
+                IconButton(onClick = openProfile) {
+                    AsyncImage(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape),
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(avatarUrl)
+                            .crossfade(true)
+                            .error(R.drawable.ic_launcher_foreground)
+                            .build(),
+                        contentDescription = null
+                    )
+                }
             }
             // bottom content
             Column(
@@ -232,7 +345,7 @@ fun CarouselCard(
                 Text(
                     text = name,
                     style = MaterialTheme.typography.titleLarge.copy(
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold
                     ),
                 )
@@ -243,17 +356,17 @@ fun CarouselCard(
                 ) {
                     Text(
                         text = description,
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.primary,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                     )
                     FloatingActionButton(
                         onClick = goToDetails,
-                        backgroundColor = Color.White
+                        backgroundColor = MaterialTheme.colorScheme.primary
                     ) {
                         Icon(
                             imageVector = Icons.Default.ChevronRight,
-                            tint = Color.Black,
+                            tint = MaterialTheme.colorScheme.onPrimary,
                             contentDescription = null
                         )
                     }

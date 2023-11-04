@@ -14,7 +14,7 @@ import com.erapp.nimblesurvey.utils.NavigationDestinations
  *
  * */
 sealed class NavigationHelper(
-    val baseRoute: String,
+    private val baseRoute: String,
     private val navArgs: List<NavArgs> = emptyList(),
 ) {
     val route = run {

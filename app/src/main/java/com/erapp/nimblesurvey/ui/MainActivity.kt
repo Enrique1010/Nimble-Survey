@@ -63,7 +63,8 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NimbleSurveyNavHost(
                         startDestination = startDestination,
-                        authState = authState
+                        authState = authState,
+                        logout = viewModel::logout
                     )
                 }
             }

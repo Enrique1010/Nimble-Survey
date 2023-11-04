@@ -11,7 +11,10 @@ import com.erapp.nimblesurvey.utils.NavigationRoutes.HOME_ROUTE
 import com.erapp.nimblesurvey.utils.composable
 import com.erapp.nimblesurvey.utils.safeNavigate
 
-fun NavGraphBuilder.homeNavGraph(navController: NavController) {
+fun NavGraphBuilder.homeNavGraph(
+    navController: NavController,
+    onLogout: () -> Unit = {}
+) {
     navigation(
         startDestination = NavigationHelper.HomeScreen.route,
         route = HOME_ROUTE
@@ -20,9 +23,10 @@ fun NavGraphBuilder.homeNavGraph(navController: NavController) {
             val viewModel = hiltViewModel<HomeScreenViewModel>()
 
             HomeScreen(
-                surveys = viewModel.homeScreenData.surveys,
+                homeScreenData = viewModel.homeScreenData,
                 homeScreenState = viewModel.homeScreenState,
                 onEvent = viewModel::onEvent,
+                onLogout = onLogout,
                 onSurveyButtonPressed = {
                     navController.safeNavigate(NavigationHelper.SurveyDetailsScreen.route)
                 }

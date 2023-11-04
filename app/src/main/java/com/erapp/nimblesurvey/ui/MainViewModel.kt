@@ -17,7 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val dataStoreRepository: DataStorePreferencesRepository
+    private val dataStoreRepository: DataStorePreferencesRepository,
+    private val nimbleAuthRepository: NimbleAuthRepository
 ): ViewModel() {
 
     val isAuthenticated: Boolean = runBlocking(Dispatchers.Default) {
@@ -37,6 +38,12 @@ class MainViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = MainActivityState.Idle
     )
+
+    fun logout() {
+        viewModelScope.launch {
+            nimbleAuthRepository.logout()
+        }
+    }
 
     sealed interface MainActivityState {
         data object Idle : MainActivityState

@@ -32,3 +32,32 @@ suspend fun <R : Any, E: Any> mapApiResponseToResult(
         }
     }
 }
+
+suspend fun <R : Any, E: Any> mapResponseToResult(
+    request: suspend () -> NetworkResponse<R, E>
+): Result<R, E> {
+    return when (val result = request()) {
+        is NetworkResponse.Empty -> Result.Success(null)
+        is NetworkResponse.Success -> {
+            Result.Success(result.body)
+        }
+        is NetworkResponse.ApiError<E> -> {
+            Result.Error(
+                data = result.body,
+                code = result.code,
+            )
+        }
+        is NetworkResponse.NetworkError -> {
+            Result.Error(
+                message = result.error.message,
+                exception = result.error
+            )
+        }
+        is NetworkResponse.UnknownError -> {
+            Result.Error(
+                message = result.error?.message,
+                exception = result.error
+            )
+        }
+    }
+}

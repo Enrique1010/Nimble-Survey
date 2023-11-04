@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.erapp.nimblesurvey.ui.theme.LocalNimbleColors
 
 @Composable
 fun TopLoaderShimmer() {
@@ -110,15 +111,17 @@ fun BottomLoaderShimmer() {
 
 fun Modifier.shimmerEffect(
     colors: List<Color> = emptyList(),
-    animationDuration: Int = 2000
+    animationDuration: Int = 1500
 ): Modifier = composed {
+    val nimbleColors = LocalNimbleColors.current
+
     val shimmerColors by remember {
         mutableStateOf(
             colors.ifEmpty {
                 listOf(
-                    Color(0xFF44464F).copy(alpha = 0.3f),
-                    Color(0xFFAEAEB1).copy(alpha = 0.3f),
-                    Color(0xFF44464F).copy(alpha = 0.3f),
+                    nimbleColors.nimbleDarkGrey.copy(alpha = 0.3f),
+                    nimbleColors.nimbleLightGrey.copy(alpha = 0.3f),
+                    nimbleColors.nimbleDarkGrey.copy(alpha = 0.3f),
                 )
             }
         )

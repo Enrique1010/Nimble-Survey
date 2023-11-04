@@ -12,10 +12,17 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.erapp.nimblesurvey.R
 import com.erapp.nimblesurvey.ui.MainViewModel
+import com.erapp.nimblesurvey.ui.components.CustomAlertDialog
 import com.erapp.nimblesurvey.utils.NavigationRoutes.AUTH_ROUTE
 import com.erapp.nimblesurvey.utils.popUpToTop
 
@@ -23,9 +30,19 @@ import com.erapp.nimblesurvey.utils.popUpToTop
 @Composable
 fun NimbleSurveyNavHost(
     startDestination: String,
-    authState: MainViewModel.MainActivityState
+    authState: MainViewModel.MainActivityState,
+    logout: () -> Unit = {}
 ) {
     val navController = rememberNavController()
+    var isVisible by rememberSaveable { mutableStateOf(false) }
+
+    // perform clean navigation to auth route when user logout
+    fun navigateToRoute(route: String) {
+        navController.navigate(route) {
+            popUpToTop(navController)
+            launchSingleTop = true
+        }
+    }
 
     // perform navigation based on the authState
     LaunchedEffect(key1 = authState) {
@@ -54,7 +71,21 @@ fun NimbleSurveyNavHost(
             startDestination = startDestination
         ) {
             authNavGraph(navController)
-            homeNavGraph(navController)
+            homeNavGraph(navController) { isVisible = !isVisible }
         }
+    }
+
+    if (isVisible) {
+        CustomAlertDialog(
+            titleString = stringResource(R.string.home_screen_logout_label),
+            textString = stringResource(R.string.home_screen_logout_confirmation),
+            confirmButtonText = R.string.home_screen_btn_logout_label,
+            onDismiss = { isVisible = false },
+            onConfirmationPressed = {
+                isVisible = false
+                logout()
+                navigateToRoute(AUTH_ROUTE)
+            }
+        )
     }
 }

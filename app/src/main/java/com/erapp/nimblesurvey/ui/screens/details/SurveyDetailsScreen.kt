@@ -18,7 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -56,7 +55,7 @@ fun SurveyDetailsScreen(
                     IconButton(onClick = onBackPressed) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            tint = Color.White,
+                            tint = MaterialTheme.colorScheme.primary,
                             contentDescription = null
                         )
                     }
@@ -64,14 +63,14 @@ fun SurveyDetailsScreen(
                 Text(
                     text = stringResource(R.string.survey_details_name_label),
                     style = MaterialTheme.typography.headlineLarge.copy(
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.primary,
                         fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
                     )
                 )
                 Text(
                     text = stringResource(R.string.survey_details_description_label),
                     style = MaterialTheme.typography.bodyLarge.copy(
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.primary
                     )
                 )
             }

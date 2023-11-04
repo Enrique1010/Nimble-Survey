@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -37,6 +38,7 @@ import com.erapp.nimblesurvey.ui.components.NimbleTextField
 import com.erapp.nimblesurvey.ui.screens.auth.LoginScreenViewModel.LoginFields
 import com.erapp.nimblesurvey.ui.screens.auth.LoginScreenViewModel.LoginScreenEvent
 import com.erapp.nimblesurvey.ui.screens.auth.LoginScreenViewModel.LoginState
+import com.erapp.nimblesurvey.ui.theme.LocalNimbleColors
 import kotlinx.coroutines.delay
 import kotlin.time.ExperimentalTime
 
@@ -95,9 +97,9 @@ fun LoginScreen(
                     .background(
                         brush = Brush.verticalGradient(
                             colors = listOf(
-                                Color.DarkGray,
-                                Color.Black,
-                                Color.Black
+                                LocalNimbleColors.current.nimbleDarkerGrey,
+                                MaterialTheme.colorScheme.secondary,
+                                MaterialTheme.colorScheme.secondary
                             )
                         ),
                         alpha = 0.9f

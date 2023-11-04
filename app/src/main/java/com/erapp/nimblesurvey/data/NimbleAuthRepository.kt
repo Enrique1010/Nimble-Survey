@@ -6,13 +6,19 @@ import com.erapp.nimblesurvey.data.datastore.DataStorePreferencesRepository
 import com.erapp.nimblesurvey.data.models.ErrorResponse
 import com.erapp.nimblesurvey.data.models.LoginRequest
 import com.erapp.nimblesurvey.data.models.LoginResponse
+import com.erapp.nimblesurvey.data.models.LogoutRequest
+import com.erapp.nimblesurvey.data.models.ProfileResponse
 import com.erapp.nimblesurvey.data.models.UserInfo
 import com.erapp.nimblesurvey.data.result.Result
 import com.erapp.nimblesurvey.utils.mapApiResponseToResult
+import com.erapp.nimblesurvey.utils.mapResponseToResult
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 interface NimbleAuthRepository {
     suspend fun login(email: String, password: String): Result<LoginResponse, ErrorResponse>
+    suspend fun logout(): Result<Unit, ErrorResponse>
+    suspend fun getProfile(): Result<ProfileResponse, *>
 }
 
 class NimbleAuthRepositoryImpl @Inject constructor(
@@ -44,5 +50,24 @@ class NimbleAuthRepositoryImpl @Inject constructor(
             else -> Unit
         }
         result
+    }
+
+    override suspend fun logout(): Result<Unit, ErrorResponse> = mapResponseToResult {
+        val token = dataStorePreferencesRepository.userCredentials.first()?.accessToken
+        val result = nimbleApiService.logout(
+            LogoutRequest(token = token)
+        )
+        // clear token
+        when(result) {
+            is NetworkResponse.Success -> {
+                dataStorePreferencesRepository.saveUserCredentials(UserInfo())
+            }
+            else -> Unit
+        }
+        result
+    }
+
+    override suspend fun getProfile(): Result<ProfileResponse, *> = mapApiResponseToResult {
+        nimbleApiService.getProfile()
     }
 }

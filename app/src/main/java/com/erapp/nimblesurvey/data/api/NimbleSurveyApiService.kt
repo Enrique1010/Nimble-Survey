@@ -4,6 +4,8 @@ import com.erapp.nimblesurvey.data.models.ApiResponse
 import com.erapp.nimblesurvey.data.models.ErrorResponse
 import com.erapp.nimblesurvey.data.models.LoginRequest
 import com.erapp.nimblesurvey.data.models.LoginResponse
+import com.erapp.nimblesurvey.data.models.LogoutRequest
+import com.erapp.nimblesurvey.data.models.ProfileResponse
 import com.erapp.nimblesurvey.data.models.RefreshTokenRequest
 import com.erapp.nimblesurvey.data.models.Survey
 import com.erapp.nimblesurvey.utils.HTTPRoutes
@@ -26,6 +28,15 @@ interface NimbleSurveyApiService {
     suspend fun refreshToken(
         @Body body: RefreshTokenRequest
     ): NetworkResponse<ApiResponse<LoginResponse>, ErrorResponse>
+
+    @POST(HTTPRoutes.LOGOUT)
+    @NotRequiredAuthorization
+    suspend fun logout(
+        @Body body: LogoutRequest
+    ): NetworkResponse<Unit, ErrorResponse>
+
+    @GET(HTTPRoutes.PROFILE)
+    suspend fun getProfile(): NetworkResponse<ApiResponse<ProfileResponse>, ApiResponse<ProfileResponse>>
 
     // survey endpoints
     @GET(HTTPRoutes.SURVEY_LIST)
