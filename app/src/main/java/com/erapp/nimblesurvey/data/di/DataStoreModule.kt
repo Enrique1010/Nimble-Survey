@@ -5,6 +5,7 @@ import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.SharedPreferencesMigration
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStore
+import com.erapp.nimblesurvey.data.datastore.CryptoManager
 import com.erapp.nimblesurvey.data.datastore.DataStorePreferencesRepository
 import com.erapp.nimblesurvey.data.datastore.DataStorePreferencesRepositoryImpl
 import com.erapp.nimblesurvey.data.datastore.DataStorePreferencesRepositoryImpl.Companion.PREFS_NAME
@@ -37,6 +38,13 @@ object PreferencesStorageModule {
 
     @Singleton
     @Provides
-    fun providePreferenceStorage(@ApplicationContext context: Context): DataStorePreferencesRepository =
-        DataStorePreferencesRepositoryImpl(context.dataStore)
+    fun provideCryptoManager(): CryptoManager = CryptoManager()
+
+    @Singleton
+    @Provides
+    fun providePreferenceStorage(
+        @ApplicationContext context: Context,
+        cryptoManager: CryptoManager
+    ): DataStorePreferencesRepository =
+        DataStorePreferencesRepositoryImpl(context.dataStore, cryptoManager)
 }

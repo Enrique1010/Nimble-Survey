@@ -25,7 +25,7 @@ import com.erapp.nimblesurvey.utils.popUpToTop
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun NimbleSurveyNavHost(
-    startDestination: String = HOME_ROUTE/*AUTH_ROUTE*/, // todo: start destination is required
+    startDestination: String,
 ) {
     val navController = rememberNavController()
     var isVisible by rememberSaveable { mutableStateOf(false) } // logout dialog if needed

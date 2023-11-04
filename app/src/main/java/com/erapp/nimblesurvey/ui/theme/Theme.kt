@@ -24,7 +24,7 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun NimbleSurveyTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = true,
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {

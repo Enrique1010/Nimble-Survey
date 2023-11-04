@@ -4,15 +4,16 @@ import android.app.Application
 import com.erapp.nimblesurvey.BuildConfig
 import com.erapp.nimblesurvey.data.api.NetworkResponseAdapterFactory
 import com.erapp.nimblesurvey.data.api.NimbleSurveyApiService
+import com.erapp.nimblesurvey.data.api.TokenAuthenticator
 import com.erapp.nimblesurvey.data.datastore.DataStorePreferencesRepository
 import com.erapp.nimblesurvey.utils.NotRequiredAuthorization
-import com.erapp.nimblesurvey.utils.TokenAuthenticator
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import okhttp3.Cache
 import okhttp3.Interceptor
@@ -21,6 +22,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Invocation
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
@@ -58,8 +60,8 @@ object NetworkModule {
         val builder = OkHttpClient.Builder()
 
         builder.apply {
-            cache(cache)
             authenticator(tokenAuthenticator)
+            cache(cache)
             addInterceptor(Interceptor { chain ->
                 val originalRequest = chain.request()
                 val method = originalRequest.tag(Invocation::class.java)!!.method()
@@ -68,7 +70,7 @@ object NetworkModule {
                     chain.proceed(originalRequest)
                 } else {
                     val token = runBlocking(Dispatchers.IO) {
-                        "wXm7Q1NmteogShLsO8Tk64zJmB34OSSOfA_iG2uj1Lk"
+                        preferences.userCredentials.first()?.accessToken.orEmpty()
                     }
                     val request = originalRequest.newBuilder()
                         .addHeader(AUTHORIZATION_HEADER, "Bearer $token")
@@ -92,16 +94,24 @@ object NetworkModule {
         return GsonConverterFactory.create(gson)
     }
 
+    @Singleton
+    @Provides
+    fun provideScalarsConverterFactory(): ScalarsConverterFactory {
+        return ScalarsConverterFactory.create()
+    }
+
     @Provides
     @Singleton
     fun provideRetrofitApi(
         okHttpClient: OkHttpClient,
-        gsonConverterFactory: GsonConverterFactory
+        gsonConverterFactory: GsonConverterFactory,
+        scalarsConverterFactory: ScalarsConverterFactory
     ): NimbleSurveyApiService {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.NIMBLE_BASE_URL)
             .addCallAdapterFactory(NetworkResponseAdapterFactory())
             .addConverterFactory(gsonConverterFactory)
+            .addConverterFactory(scalarsConverterFactory)
             .client(okHttpClient)
             .build()
             .create(NimbleSurveyApiService::class.java)
