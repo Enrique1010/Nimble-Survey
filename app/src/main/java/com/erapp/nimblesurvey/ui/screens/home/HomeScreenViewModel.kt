@@ -18,12 +18,11 @@ class HomeScreenViewModel @Inject constructor(
 ): ViewModel() {
 
     var homeScreenData by mutableStateOf(HomeScreenData())
-    var homeScreenState: HomeScreenState by mutableStateOf(HomeScreenState.Idle)
+    var homeScreenState: HomeScreenState by mutableStateOf(HomeScreenState.Loading)
 
     init { getSurveys() }
 
     private fun getSurveys() {
-        homeScreenState = HomeScreenState.Loading
         viewModelScope.launch {
             when(val result = surveyRepository.getSurveys()) {
                 Result.Loading -> Unit
@@ -53,7 +52,6 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     sealed interface HomeScreenState {
-        data object Idle : HomeScreenState
         data object Loading : HomeScreenState
         data object Success : HomeScreenState
         data object Empty : HomeScreenState

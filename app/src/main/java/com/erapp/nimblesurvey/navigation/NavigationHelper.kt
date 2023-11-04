@@ -36,7 +36,7 @@ sealed class NavigationHelper(
     data object ForgotPasswordScreen : NavigationHelper(NavigationDestinations.FORGOT_PASSWORD_SCREEN)
     // home
     data object HomeScreen : NavigationHelper(NavigationDestinations.HOME_SCREEN)
-    data object SurveyScreen : NavigationHelper(NavigationDestinations.SURVEY_DETAILS_SCREEN)
+    data object SurveyDetailsScreen : NavigationHelper(NavigationDestinations.SURVEY_DETAILS_SCREEN)
 }
 
 enum class NavArgs(

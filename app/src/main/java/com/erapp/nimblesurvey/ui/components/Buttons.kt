@@ -14,13 +14,14 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun NimbleButton(
+    modifier: Modifier = Modifier,
     buttonText: String,
     isEnabled: Boolean = true,
     onPressed: () -> Unit = {},
 ) {
 
     Button(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier,
         onClick = onPressed,
         enabled = isEnabled,
         colors = ButtonDefaults.buttonColors(
@@ -32,7 +33,7 @@ fun NimbleButton(
             modifier = Modifier.padding(16.dp),
             text = buttonText,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground
+            color = Color.Black
         )
     }
 }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -26,6 +27,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.erapp.nimblesurvey.R
@@ -100,7 +102,7 @@ fun LoginScreen(
                         ),
                         alpha = 0.9f
                     )
-            ) {}
+            )
         }
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -128,23 +130,23 @@ fun LoginScreen(
                             .imePadding()
                             .padding(horizontal = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {//item {
+                    ) {
                         NimbleTextField(
                             value = loginFields.email,
                             onValueChange = { onEvent(LoginScreenEvent.OnEmailChange(it)) },
                             imeAction = ImeAction.Next,
                             errorMessage = if (loginFields.email.isNotEmpty() && !isValidEmail) {
-                                "Please enter a valid email"
+                                stringResource(R.string.login_please_enter_a_valid_email_error_label)
                             } else {
                                 ""
                             },
-                            placeHolderText = "Email"
+                            placeHolderText = stringResource(R.string.login_email_placeholder)
                         )
                         NimbleTextField(
                             value = loginFields.password,
                             onValueChange = { onEvent(LoginScreenEvent.OnPasswordChange(it)) },
                             errorMessage = errorMessage,
-                            placeHolderText = "Password",
+                            placeHolderText = stringResource(R.string.login_password_placeholder),
                             isPasswordTextField = true,
                             imeAction = ImeAction.Done,
                             leadingIcon = {
@@ -154,14 +156,15 @@ fun LoginScreen(
                                     }
                                 ) {
                                     Text(
-                                        text = "Forgot?",
+                                        text = stringResource(R.string.login_forgot_btn),
                                         color = Color.White.copy(alpha = 0.3f)
                                     )
                                 }
                             }
                         )
                         NimbleButton(
-                            buttonText = "Log in",
+                            modifier = Modifier.fillMaxWidth(),
+                            buttonText = stringResource(R.string.log_in_btn),
                             isEnabled = isLoginEnabled,
                         ) {
                             onEvent(LoginScreenEvent.OnLoginClick)

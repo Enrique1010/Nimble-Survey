@@ -2,7 +2,7 @@ package com.erapp.nimblesurvey.data.api
 
 import com.erapp.nimblesurvey.data.models.ApiResponse
 import com.erapp.nimblesurvey.data.models.ErrorResponse
-import com.erapp.nimblesurvey.data.models.Login
+import com.erapp.nimblesurvey.data.models.LoginRequest
 import com.erapp.nimblesurvey.data.models.LoginResponse
 import com.erapp.nimblesurvey.data.models.RefreshTokenRequest
 import com.erapp.nimblesurvey.data.models.Survey
@@ -18,7 +18,7 @@ interface NimbleSurveyApiService {
     @POST(HTTPRoutes.AUTH)
     @NotRequiredAuthorization
     suspend fun login(
-        @Body body: Login
+        @Body body: LoginRequest
     ): NetworkResponse<ApiResponse<LoginResponse>, ErrorResponse>
 
     @POST(HTTPRoutes.AUTH)

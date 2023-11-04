@@ -4,7 +4,7 @@ import com.erapp.nimblesurvey.BuildConfig
 import com.erapp.nimblesurvey.utils.GrantTypes
 import com.google.gson.annotations.SerializedName
 
-data class Login(
+data class LoginRequest(
     @SerializedName("grant_type")
     val grantType: String = GrantTypes.PASSWORD.value,
     @SerializedName("email")

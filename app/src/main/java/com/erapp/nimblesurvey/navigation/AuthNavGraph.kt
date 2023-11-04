@@ -31,6 +31,5 @@ fun NavGraphBuilder.authNavGraph(navController: NavController) {
                 }
             )
         }
-        //todo: add other screens
     }
 }

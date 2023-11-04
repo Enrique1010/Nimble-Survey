@@ -1,6 +1,19 @@
 <resources>
+    <!-- Common -->
     <string name="app_name">Nimble Survey</string>
     <string name="generic_error_message">Oh no! something went wrong please, try again later.</string>
     <string name="generic_empty_message">No Surveys to show please, try again later.</string>
     <string name="btn_retry">Retry</string>
+    <!-- Survey Details -->
+    <string name="survey_details_name_label">Survey Name</string>
+    <string name="survey_details_description_label">Survey Description</string>
+    <string name="survey_details_btn_start_survey">Start Survey</string>
+    <!-- Login -->
+    <string name="log_in_btn">Log in</string>
+    <string name="login_forgot_btn">Forgot?</string>
+    <string name="login_password_placeholder">Password</string>
+    <string name="login_email_placeholder">Email</string>
+    <string name="login_please_enter_a_valid_email_error_label">Please enter a valid email</string>
+    <!-- Home -->
+    <string name="home_today_label">Today</string>
 </resources>

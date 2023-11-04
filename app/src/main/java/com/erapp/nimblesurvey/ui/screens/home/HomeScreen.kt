@@ -42,14 +42,17 @@ import com.erapp.nimblesurvey.data.models.Survey
 import com.erapp.nimblesurvey.ui.components.BottomLoaderShimmer
 import com.erapp.nimblesurvey.ui.components.CarouselDots
 import com.erapp.nimblesurvey.ui.components.ScreenWithMessage
+import com.erapp.nimblesurvey.ui.components.TopLoaderShimmer
 import com.erapp.nimblesurvey.ui.screens.home.HomeScreenViewModel.HomeScreenEvent
 import com.erapp.nimblesurvey.ui.screens.home.HomeScreenViewModel.HomeScreenState
+import com.erapp.nimblesurvey.utils.toNamedDateFormat
+import com.erapp.nimblesurvey.utils.toTimeAgo
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
     surveys: List<Survey> = emptyList(),
-    homeScreenState: HomeScreenState = HomeScreenState.Idle,
+    homeScreenState: HomeScreenState,
     onEvent: (HomeScreenEvent) -> Unit = {},
     onSurveyButtonPressed: () -> Unit = {}
 ) {
@@ -60,13 +63,19 @@ fun HomeScreen(
     }
 
     Box {
-        when(homeScreenState) {
+        when (homeScreenState) {
+            HomeScreenState.Loading -> {
+                // loading screen
+                CarouselLoadingScreen()
+            }
+
             is HomeScreenState.Error -> {
                 // error screen
                 ScreenWithMessage(
                     onRetry = { onEvent(HomeScreenEvent.OnRefreshSurveys) },
                 )
             }
+
             HomeScreenState.Empty -> {
                 // empty screen
                 ScreenWithMessage(
@@ -74,6 +83,7 @@ fun HomeScreen(
                     onRetry = { onEvent(HomeScreenEvent.OnRefreshSurveys) },
                 )
             }
+
             HomeScreenState.Success -> {
                 Box {
                     HorizontalPager(
@@ -84,7 +94,7 @@ fun HomeScreen(
                             name = survey?.attributes?.title.orEmpty(),
                             description = survey?.attributes?.description.orEmpty(),
                             imageUrl = survey?.attributes?.coverImageUrl.orEmpty(),
-                            isLoading = homeScreenState is HomeScreenState.Loading,
+                            date = survey?.attributes?.createdAt.orEmpty(),
                             goToDetails = onSurveyButtonPressed
                         )
                     }
@@ -97,7 +107,36 @@ fun HomeScreen(
                     )
                 }
             }
-            else -> Unit
+        }
+    }
+}
+
+@Composable
+fun CarouselLoadingScreen() {
+    Box {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Black,
+                            Color.Black,
+                            Color.Black
+                        )
+                    ),
+                )
+        )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .systemBarsPadding()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            TopLoaderShimmer()
+            BottomLoaderShimmer()
         }
     }
 }
@@ -106,145 +145,117 @@ fun HomeScreen(
 fun CarouselCard(
     name: String,
     description: String,
+    date: String,
     imageUrl: String,
-    isLoading: Boolean = false,
     goToDetails: () -> Unit = {}
 ) {
-    if (isLoading) {
-        Box {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(
-                                Color.Black,
-                                Color.Black,
-                                Color.Black
-                            )
-                        ),
-                    )
-            )
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .systemBarsPadding()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                BottomLoaderShimmer()
-                BottomLoaderShimmer()
-            }
-        }
-    } else {
-        Box {
-            SubcomposeAsyncImage(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .blur(
-                        radiusX = 8.dp,
-                        radiusY = 8.dp,
-                        edgeTreatment = BlurredEdgeTreatment(RoundedCornerShape(4.dp))
-                    ),
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(imageUrl)
-                    .crossfade(true)
-                    .placeholder(R.drawable.nimble_survey_bg_opacity)
-                    .error(R.drawable.nimble_survey_bg_opacity)
-                    .build(),
-                loading = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(color = Color.Black)
-                    )
-                },
-                contentDescription = null,
-                alignment = Alignment.CenterStart,
-                contentScale = ContentScale.FillBounds,
-            )
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(
-                                Color.DarkGray,
-                                Color.Black,
-                                Color.Black
-                            )
-                        ),
-                        alpha = 0.7f
-                    )
-            )
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .systemBarsPadding()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    Column {
-                        Text(
-                            text = "Today",
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                color = Color.White,
-                            ),
-                        )
-                        Text(
-                            text = "Today",
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold
-                            ),
-                        )
-                    }
-                    Icon(
-                        modifier = Modifier.size(36.dp),
-                        imageVector = Icons.Default.AccountCircle,
-                        tint = Color.White,
-                        contentDescription = null
-                    )
-                }
-                // bottom content
-                Column(
+    Box {
+        SubcomposeAsyncImage(
+            modifier = Modifier
+                .fillMaxSize()
+                .blur(
+                    radiusX = 8.dp,
+                    radiusY = 8.dp,
+                    edgeTreatment = BlurredEdgeTreatment(RoundedCornerShape(4.dp))
+                ), // perform some blur effect to appease poor quality images
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageUrl)
+                .crossfade(true)
+                .placeholder(R.drawable.nimble_survey_bg_opacity)
+                .error(R.drawable.nimble_survey_bg_opacity)
+                .build(),
+            loading = {
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(96.dp)
-                ) {
+                        .fillMaxSize()
+                        .background(color = Color.Black)
+                )
+            },
+            contentDescription = null,
+            alignment = Alignment.CenterStart,
+            contentScale = ContentScale.FillBounds,
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color.DarkGray,
+                            Color.Black,
+                            Color.Black
+                        )
+                    ),
+                    alpha = 0.7f
+                )
+        )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .systemBarsPadding()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Column {
                     Text(
-                        text = name,
+                        text = date.toNamedDateFormat(), //"EEEE, MMMM dd"
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            color = Color.White,
+                        ),
+                    )
+                    Text(
+                        text = date.toTimeAgo(),
                         style = MaterialTheme.typography.titleLarge.copy(
                             color = Color.White,
                             fontWeight = FontWeight.Bold
                         ),
                     )
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier.fillMaxWidth()
+                }
+                Icon(
+                    modifier = Modifier.size(36.dp),
+                    imageVector = Icons.Default.AccountCircle,
+                    tint = Color.White,
+                    contentDescription = null
+                )
+            }
+            // bottom content
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(96.dp)
+            ) {
+                Text(
+                    text = name,
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    ),
+                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = description,
+                        color = Color.White,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    FloatingActionButton(
+                        onClick = goToDetails,
+                        backgroundColor = Color.White
                     ) {
-                        Text(
-                            text = description,
-                            color = Color.White,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
+                        Icon(
+                            imageVector = Icons.Default.ChevronRight,
+                            tint = Color.Black,
+                            contentDescription = null
                         )
-                        FloatingActionButton(
-                            onClick = goToDetails,
-                            backgroundColor = Color.White,
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.ChevronRight,
-                                contentDescription = null
-                            )
-                        }
                     }
                 }
             }

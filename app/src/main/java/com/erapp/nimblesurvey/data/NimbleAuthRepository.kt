@@ -4,12 +4,11 @@ import com.erapp.nimblesurvey.data.api.NetworkResponse
 import com.erapp.nimblesurvey.data.api.NimbleSurveyApiService
 import com.erapp.nimblesurvey.data.datastore.DataStorePreferencesRepository
 import com.erapp.nimblesurvey.data.models.ErrorResponse
-import com.erapp.nimblesurvey.data.models.Login
+import com.erapp.nimblesurvey.data.models.LoginRequest
 import com.erapp.nimblesurvey.data.models.LoginResponse
-import com.erapp.nimblesurvey.data.models.RefreshTokenRequest
 import com.erapp.nimblesurvey.data.models.UserInfo
-import com.erapp.nimblesurvey.utils.mapApiResponseToResult
 import com.erapp.nimblesurvey.data.result.Result
+import com.erapp.nimblesurvey.utils.mapApiResponseToResult
 import javax.inject.Inject
 
 interface NimbleAuthRepository {
@@ -25,7 +24,7 @@ class NimbleAuthRepositoryImpl @Inject constructor(
         password: String
     ): Result<LoginResponse, ErrorResponse> = mapApiResponseToResult {
         val result = nimbleApiService.login(
-            Login(
+            LoginRequest(
                 email = email,
                 password = password
             )

@@ -5,67 +5,104 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 
 @Composable
+fun TopLoaderShimmer() {
+    val contentHeight = 20.dp
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column {
+            Box(
+                modifier = Modifier
+                    .height(contentHeight)
+                    .fillMaxWidth(.4f)
+                    .shimmerEffect()
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Box(
+                modifier = Modifier
+                    .height(contentHeight)
+                    .fillMaxWidth(.3f)
+                    .shimmerEffect()
+            )
+        }
+        // circle
+        Box(
+            modifier = Modifier
+                .height(40.dp)
+                .width(40.dp)
+                .shimmerEffect()
+        )
+    }
+}
+
+@Composable
 fun BottomLoaderShimmer() {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth(),
+    val contentHeight = 20.dp
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.Start
     ) {
         Box(
             modifier = Modifier
-                .height(36.dp)
-                .width(24.dp)
+                .height(contentHeight)
+                .fillMaxWidth(.1f)
                 .shimmerEffect()
         )
         Spacer(modifier = Modifier.height(16.dp))
         Box(
             modifier = Modifier
-                .height(36.dp)
-                .width(140.dp)
+                .height(contentHeight)
+                .fillMaxWidth(.7f)
                 .shimmerEffect()
         )
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Box(
             modifier = Modifier
-                .height(36.dp)
-                .width(72.dp)
+                .height(contentHeight)
+                .fillMaxWidth(.4f)
                 .shimmerEffect()
         )
         Spacer(modifier = Modifier.height(16.dp))
         Box(
             modifier = Modifier
-                .height(36.dp)
-                .width(196.dp)
+                .height(contentHeight)
+                .fillMaxWidth(.9f)
                 .shimmerEffect()
         )
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Box(
             modifier = Modifier
-                .height(36.dp)
-                .width(98.dp)
+                .height(contentHeight)
+                .fillMaxWidth(.5f)
                 .shimmerEffect()
         )
     }
@@ -79,9 +116,9 @@ fun Modifier.shimmerEffect(
         mutableStateOf(
             colors.ifEmpty {
                 listOf(
-                    Color(0xFF1B1B1F).copy(alpha = 0.3f),
                     Color(0xFF44464F).copy(alpha = 0.3f),
-                    Color(0xFF1B1B1F).copy(alpha = 0.3f),
+                    Color(0xFFAEAEB1).copy(alpha = 0.3f),
+                    Color(0xFF44464F).copy(alpha = 0.3f),
                 )
             }
         )
@@ -103,7 +140,8 @@ fun Modifier.shimmerEffect(
             colors = shimmerColors,
             start = Offset(startOffsetX, 0f),
             end = Offset(startOffsetX + size.width.toFloat(), size.height.toFloat())
-        )
+        ),
+        shape = CircleShape
     ).onGloballyPositioned {
         size = it.size
     }

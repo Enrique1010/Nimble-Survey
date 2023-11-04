@@ -11,30 +11,29 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.erapp.nimblesurvey.ui.MainViewModel
 import com.erapp.nimblesurvey.utils.NavigationRoutes.AUTH_ROUTE
-import com.erapp.nimblesurvey.utils.NavigationRoutes.HOME_ROUTE
 import com.erapp.nimblesurvey.utils.popUpToTop
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun NimbleSurveyNavHost(
     startDestination: String,
+    authState: MainViewModel.MainActivityState
 ) {
     val navController = rememberNavController()
-    var isVisible by rememberSaveable { mutableStateOf(false) } // logout dialog if needed
 
-    // perform clean navigation to auth route when user logout
-    fun navigateToRoute(route: String) {
-        navController.navigate(route) {
-            popUpToTop(navController)
-            launchSingleTop = true
+    // perform navigation based on the authState
+    LaunchedEffect(key1 = authState) {
+        if (authState is MainViewModel.MainActivityState.Unauthorized) {
+            navController.navigate(AUTH_ROUTE) {
+                popUpToTop(navController)
+                launchSingleTop = true
+            }
         }
     }
 

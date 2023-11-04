@@ -7,17 +7,17 @@ import com.erapp.nimblesurvey.data.result.Result
 import com.erapp.nimblesurvey.utils.mapApiResponseToResult
 
 interface NimbleSurveyRepository {
-    suspend fun getSurveys(
-        pageSize: Int? = null,
-    ): Result<List<Survey>, *>
+    suspend fun getSurveys(): Result<List<Survey>, *>
 }
 
 class NimbleSurveyRepositoryImpl @Inject constructor(
     private val apiService: NimbleSurveyApiService
 ) : NimbleSurveyRepository {
-    override suspend fun getSurveys(
-        pageSize: Int?
-    ): Result<List<Survey>, *> = mapApiResponseToResult {
-        apiService.getSurveyList(pageSize = pageSize)
+    override suspend fun getSurveys(): Result<List<Survey>, *> = mapApiResponseToResult {
+        val randomPageSize = (6..15).random() // simulate daily data flow
+        apiService.getSurveyList(
+            page = 1,
+            pageSize = randomPageSize
+        )
     }
 }

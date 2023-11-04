@@ -4,10 +4,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.navigation
+import com.erapp.nimblesurvey.ui.screens.details.SurveyDetailsScreen
 import com.erapp.nimblesurvey.ui.screens.home.HomeScreen
 import com.erapp.nimblesurvey.ui.screens.home.HomeScreenViewModel
 import com.erapp.nimblesurvey.utils.NavigationRoutes.HOME_ROUTE
 import com.erapp.nimblesurvey.utils.composable
+import com.erapp.nimblesurvey.utils.safeNavigate
 
 fun NavGraphBuilder.homeNavGraph(navController: NavController) {
     navigation(
@@ -21,7 +23,16 @@ fun NavGraphBuilder.homeNavGraph(navController: NavController) {
                 surveys = viewModel.homeScreenData.surveys,
                 homeScreenState = viewModel.homeScreenState,
                 onEvent = viewModel::onEvent,
+                onSurveyButtonPressed = {
+                    navController.safeNavigate(NavigationHelper.SurveyDetailsScreen.route)
+                }
             )
+        }
+
+        composable(NavigationHelper.SurveyDetailsScreen) {
+            SurveyDetailsScreen {
+                navController.popBackStack()
+            }
         }
     }
 }

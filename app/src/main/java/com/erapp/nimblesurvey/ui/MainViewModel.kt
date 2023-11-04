@@ -1,10 +1,17 @@
 package com.erapp.nimblesurvey.ui
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.erapp.nimblesurvey.data.NimbleAuthRepository
 import com.erapp.nimblesurvey.data.datastore.DataStorePreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
@@ -18,7 +25,21 @@ class MainViewModel @Inject constructor(
         savedLoginData?.accessToken != null
     }
 
-    fun logout() {
-        //todo: implement logout
+    // listen to changes in the data store to perform actions
+    val authState: StateFlow<MainActivityState> = dataStoreRepository.userCredentials.map {
+        when (it?.accessToken) {
+            null -> MainActivityState.Unauthorized
+            "" -> MainActivityState.Unauthorized
+            else -> MainActivityState.Idle
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = MainActivityState.Idle
+    )
+
+    sealed interface MainActivityState {
+        data object Idle : MainActivityState
+        data object Unauthorized : MainActivityState
     }
 }
