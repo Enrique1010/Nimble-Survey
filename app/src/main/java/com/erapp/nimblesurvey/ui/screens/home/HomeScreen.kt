@@ -359,7 +359,7 @@ fun CarouselCard(
                         model = ImageRequest.Builder(LocalContext.current)
                             .data(avatarUrl)
                             .crossfade(true)
-                            .error(R.drawable.ic_launcher_foreground)
+                            .error(R.drawable.ic_notification) // the best for now
                             .build(),
                         contentDescription = null
                     )
