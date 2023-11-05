@@ -85,11 +85,17 @@ fun HomeScreen(
     ) {
         surveys.size
     }
+    //
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val pullRefreshState = rememberPullRefreshState(
         refreshing = homeScreenState == HomeScreenState.Loading,
-        onRefresh = { onEvent(HomeScreenEvent.OnRefreshSurveys) }
+        onRefresh = {
+            onEvent(HomeScreenEvent.OnRefreshSurveys)
+            scope.launch {
+                pagerState.animateScrollToPage(-1) // for some reason, the pager state is not resetting to 0
+            }
+        }
     )
 
     Box(Modifier.pullRefresh(pullRefreshState)) {
