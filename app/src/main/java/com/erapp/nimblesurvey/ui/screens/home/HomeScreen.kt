@@ -13,16 +13,23 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.IconButton
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
@@ -63,7 +70,7 @@ import com.erapp.nimblesurvey.utils.toNamedDateFormat
 import com.erapp.nimblesurvey.utils.toTimeAgo
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(
     homeScreenData: HomeScreenData,
@@ -80,71 +87,84 @@ fun HomeScreen(
     }
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = homeScreenState == HomeScreenState.Loading,
+        onRefresh = { onEvent(HomeScreenEvent.OnRefreshSurveys) }
+    )
 
-    Box {
-        when (homeScreenState) {
-            HomeScreenState.Loading -> {
-                // loading screen
-                CarouselLoadingScreen()
-            }
+    Box(Modifier.pullRefresh(pullRefreshState)) {
+        Box {
+            when (homeScreenState) {
+                HomeScreenState.Loading -> {
+                    // loading screen
+                    CarouselLoadingScreen()
+                }
 
-            is HomeScreenState.Error -> {
-                // error screen
-                ScreenWithMessage(
-                    onRetry = { onEvent(HomeScreenEvent.OnRefreshSurveys) },
-                )
-            }
+                is HomeScreenState.Error -> {
+                    // error screen
+                    ScreenWithMessage(
+                        onRetry = { onEvent(HomeScreenEvent.OnRefreshSurveys) },
+                    )
+                }
 
-            HomeScreenState.Empty -> {
-                // empty screen
-                ScreenWithMessage(
-                    errorMessage = stringResource(id = R.string.generic_empty_message),
-                    onRetry = { onEvent(HomeScreenEvent.OnRefreshSurveys) },
-                )
-            }
+                HomeScreenState.Empty -> {
+                    // empty screen
+                    ScreenWithMessage(
+                        errorMessage = stringResource(id = R.string.generic_empty_message),
+                        onRetry = { onEvent(HomeScreenEvent.OnRefreshSurveys) },
+                    )
+                }
 
-            HomeScreenState.Success -> {
-                ModalNavigationDrawer(
-                    gesturesEnabled = true,
-                    drawerState = drawerState,
-                    drawerContent = {
-                        ProfileDrawerPage(
-                            userName = homeScreenData.userName,
-                            avatarUrl = homeScreenData.avatarUrl,
-                            onLogout = onLogout
-                        )
-                    }
-                ) {
-                    Box {
-                        HorizontalPager(
-                            state = pagerState
-                        ) { page ->
-                            val survey = surveys.getOrNull(page)
-                            CarouselCard(
-                                name = survey?.title.orEmpty(),
-                                description = survey?.description.orEmpty(),
-                                imageUrl = survey?.coverImageUrl.orEmpty(),
-                                date = survey?.createdAt.orEmpty(),
+                HomeScreenState.Success -> {
+                    ModalNavigationDrawer(
+                        gesturesEnabled = true,
+                        drawerState = drawerState,
+                        drawerContent = {
+                            ProfileDrawerPage(
+                                userName = homeScreenData.userName,
                                 avatarUrl = homeScreenData.avatarUrl,
-                                goToDetails = onSurveyButtonPressed,
-                                openProfile = {
-                                    scope.launch {
-                                        drawerState.open()
-                                    }
-                                }
+                                onLogout = onLogout
                             )
                         }
-                        CarouselDots(
-                            modifier = Modifier
-                                .align(Alignment.BottomStart)
-                                .padding(bottom = 156.dp, start = 16.dp),
-                            dotsCount = surveys.size,
-                            currentPage = pagerState.currentPage
-                        )
+                    ) {
+                        Box {
+                            HorizontalPager(
+                                state = pagerState
+                            ) { page ->
+                                val survey = surveys.getOrNull(page)
+                                CarouselCard(
+                                    name = survey?.title.orEmpty(),
+                                    description = survey?.description.orEmpty(),
+                                    imageUrl = survey?.coverImageUrl.orEmpty(),
+                                    date = survey?.createdAt.orEmpty(),
+                                    avatarUrl = homeScreenData.avatarUrl,
+                                    goToDetails = onSurveyButtonPressed,
+                                    openProfile = {
+                                        scope.launch {
+                                            drawerState.open()
+                                        }
+                                    }
+                                )
+                            }
+                            CarouselDots(
+                                modifier = Modifier
+                                    .align(Alignment.BottomStart)
+                                    .padding(bottom = 156.dp, start = 16.dp),
+                                dotsCount = surveys.size,
+                                currentPage = pagerState.currentPage
+                            )
+                        }
                     }
                 }
             }
         }
+        PullRefreshIndicator(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .statusBarsPadding(),
+            refreshing = homeScreenState == HomeScreenState.Loading,
+            state = pullRefreshState
+        )
     }
 }
 
@@ -301,7 +321,8 @@ fun CarouselCard(
             modifier = Modifier
                 .fillMaxSize()
                 .systemBarsPadding()
-                .padding(16.dp),
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {

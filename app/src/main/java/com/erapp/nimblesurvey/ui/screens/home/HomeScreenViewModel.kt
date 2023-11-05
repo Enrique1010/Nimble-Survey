@@ -8,10 +8,9 @@ import androidx.lifecycle.viewModelScope
 import com.erapp.nimblesurvey.data.NimbleAuthRepository
 import com.erapp.nimblesurvey.data.NimbleSurveyRepository
 import com.erapp.nimblesurvey.data.database.entities.SurveyEntity
-import com.erapp.nimblesurvey.data.models.Survey
 import com.erapp.nimblesurvey.data.result.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.onEach
@@ -62,28 +61,29 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     private fun getSurveys() {
+        homeScreenState = HomeScreenState.Loading
         viewModelScope.launch {
-            surveyRepository.getSurveysFromNetwork()
-            /*when(val result = surveyRepository.getSurveysFromNetwork()) {
-                Result.Loading -> Unit
+            delay(1000) // this is for smoother loading animation
+            when (val result = surveyRepository.getSurveysFromNetwork()) {
+                is Result.Success -> homeScreenState = HomeScreenState.Success
                 is Result.Error -> {
-                    homeScreenState = HomeScreenState.Error(result.message.orEmpty())
-                }
-                is Result.Success -> {
-                    if (result.data?.isEmpty() == true) {
-                        homeScreenState = HomeScreenState.Empty
+                    homeScreenState = if (surveys.value.isEmpty()) {
+                        HomeScreenState.Error(result.message.orEmpty())
                     } else {
-                        homeScreenState = HomeScreenState.Success
-                        homeScreenData = homeScreenData.copy(surveys = result.data.orEmpty())
+                        HomeScreenState.Success
                     }
                 }
-            }*/
+                else -> Unit
+            }
         }
     }
 
     fun onEvent(event: HomeScreenEvent) {
         when (event) {
-            is HomeScreenEvent.OnRefreshSurveys -> getSurveys()
+            is HomeScreenEvent.OnRefreshSurveys -> {
+                getSurveys()
+                getUserProfile()
+            }
         }
     }
 

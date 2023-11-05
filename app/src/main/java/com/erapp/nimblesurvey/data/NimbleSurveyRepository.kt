@@ -8,10 +8,11 @@ import com.erapp.nimblesurvey.data.database.entities.SurveyEntity
 import com.erapp.nimblesurvey.utils.toSurveyEntity
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+import com.erapp.nimblesurvey.data.result.Result
 
 interface NimbleSurveyRepository {
     fun getSurveys(): Flow<List<SurveyEntity>>
-    suspend fun getSurveysFromNetwork()
+    suspend fun getSurveysFromNetwork(): Result<Unit, Unit>
 }
 
 class NimbleSurveyRepositoryImpl @Inject constructor(
@@ -22,13 +23,13 @@ class NimbleSurveyRepositoryImpl @Inject constructor(
         return dataBase.surveyDao().getSurveys()
     }
 
-    override suspend fun getSurveysFromNetwork() {
+    override suspend fun getSurveysFromNetwork(): Result<Unit, Unit> {
         val randomPageSize = (6..15).random() // simulate daily data flow
         val result = apiService.getSurveyList(
             page = 1,
             pageSize = randomPageSize
         )
-        when (result) {
+        return when (result) {
             is NetworkResponse.Success -> {
                 val surveys = result.body.data?.map { it.toSurveyEntity() }
                 dataBase.withTransaction {
@@ -37,8 +38,11 @@ class NimbleSurveyRepositoryImpl @Inject constructor(
                         dataBase.surveyDao().insertSurveys(surveys)
                     }
                 }
+                Result.Success(Unit)
             }
-            else -> Unit // do nothing
+            else -> {
+                Result.Error(Unit)
+            }
         }
     }
 }
