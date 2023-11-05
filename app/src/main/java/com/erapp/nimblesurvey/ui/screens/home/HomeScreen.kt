@@ -135,7 +135,7 @@ fun HomeScreen(
                         CarouselDots(
                             modifier = Modifier
                                 .align(Alignment.BottomStart)
-                                .padding(bottom = 148.dp, start = 16.dp),
+                                .padding(bottom = 156.dp, start = 16.dp),
                             dotsCount = homeScreenData.surveys.size,
                             currentPage = pagerState.currentPage
                         )

@@ -2,6 +2,8 @@ package com.erapp.nimblesurvey.data.api
 
 import com.erapp.nimblesurvey.data.models.ApiResponse
 import com.erapp.nimblesurvey.data.models.ErrorResponse
+import com.erapp.nimblesurvey.data.models.ForgotPasswordRequest
+import com.erapp.nimblesurvey.data.models.ForgotPasswordResponse
 import com.erapp.nimblesurvey.data.models.LoginRequest
 import com.erapp.nimblesurvey.data.models.LoginResponse
 import com.erapp.nimblesurvey.data.models.LogoutRequest
@@ -37,6 +39,12 @@ interface NimbleSurveyApiService {
 
     @GET(HTTPRoutes.PROFILE)
     suspend fun getProfile(): NetworkResponse<ApiResponse<ProfileResponse>, ApiResponse<ProfileResponse>>
+
+    @POST(HTTPRoutes.FORGOT_PASSWORD)
+    @NotRequiredAuthorization
+    suspend fun forgotPassword(
+        @Body body: ForgotPasswordRequest
+    ): NetworkResponse<ApiResponse<ForgotPasswordResponse>, ErrorResponse>
 
     // survey endpoints
     @GET(HTTPRoutes.SURVEY_LIST)

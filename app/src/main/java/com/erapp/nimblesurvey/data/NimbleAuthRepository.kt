@@ -4,6 +4,9 @@ import com.erapp.nimblesurvey.data.api.NetworkResponse
 import com.erapp.nimblesurvey.data.api.NimbleSurveyApiService
 import com.erapp.nimblesurvey.data.datastore.DataStorePreferencesRepository
 import com.erapp.nimblesurvey.data.models.ErrorResponse
+import com.erapp.nimblesurvey.data.models.ForgotPasswordInfo
+import com.erapp.nimblesurvey.data.models.ForgotPasswordRequest
+import com.erapp.nimblesurvey.data.models.ForgotPasswordResponse
 import com.erapp.nimblesurvey.data.models.LoginRequest
 import com.erapp.nimblesurvey.data.models.LoginResponse
 import com.erapp.nimblesurvey.data.models.LogoutRequest
@@ -18,6 +21,7 @@ import javax.inject.Inject
 interface NimbleAuthRepository {
     suspend fun login(email: String, password: String): Result<LoginResponse, ErrorResponse>
     suspend fun logout(): Result<Unit, ErrorResponse>
+    suspend fun forgotPassword(email: String): Result<ForgotPasswordResponse, ErrorResponse>
     suspend fun getProfile(): Result<ProfileResponse, *>
 }
 
@@ -65,6 +69,16 @@ class NimbleAuthRepositoryImpl @Inject constructor(
             else -> Unit
         }
         result
+    }
+
+    override suspend fun forgotPassword(
+        email: String
+    ): Result<ForgotPasswordResponse, ErrorResponse> = mapApiResponseToResult {
+        nimbleApiService.forgotPassword(
+            ForgotPasswordRequest(
+                forgotPasswordInfo = ForgotPasswordInfo(email = email)
+            )
+        )
     }
 
     override suspend fun getProfile(): Result<ProfileResponse, *> = mapApiResponseToResult {

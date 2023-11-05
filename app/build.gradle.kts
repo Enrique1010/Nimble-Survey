@@ -139,6 +139,9 @@ dependencies {
     // Work
     implementation(libs.androidx.work.runtime)
 
+    // Appcompanist
+    implementation(libs.accompanist.permissions)
+
     // Timber
     api(libs.timber)
 

@@ -1,5 +1,7 @@
 package com.erapp.nimblesurvey.ui
 
+import android.Manifest
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -7,6 +9,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -17,19 +20,23 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.erapp.nimblesurvey.navigation.NimbleSurveyNavHost
+import com.erapp.nimblesurvey.ui.MainViewModel.MainActivityState
 import com.erapp.nimblesurvey.ui.theme.NimbleSurveyTheme
 import com.erapp.nimblesurvey.utils.NavigationRoutes.AUTH_ROUTE
 import com.erapp.nimblesurvey.utils.NavigationRoutes.HOME_ROUTE
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.collect
-import com.erapp.nimblesurvey.ui.MainViewModel.MainActivityState
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val viewModel: MainViewModel by viewModels()
 
+    @OptIn(ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
@@ -56,6 +63,17 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                val notificationPermission = rememberPermissionState(
+                    permission = Manifest.permission.POST_NOTIFICATIONS
+                )
+                LaunchedEffect(key1 = Unit) {
+                    if (!notificationPermission.status.isGranted) {
+                        notificationPermission.launchPermissionRequest()
+                    }
+                }
+            }
+
             NimbleSurveyTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),

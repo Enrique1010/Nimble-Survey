@@ -50,6 +50,7 @@ fun LoginScreen(
     isValidEmail: Boolean = true,
     loginState: LoginState = LoginState.Idle,
     onEvent: (LoginScreenEvent) -> Unit = {},
+    goToForgotPassword: () -> Unit = {},
     goToHomeScreen: () -> Unit = {},
 ) {
     var contentVisible by rememberSaveable { mutableStateOf(false) }
@@ -152,11 +153,7 @@ fun LoginScreen(
                             isPasswordTextField = true,
                             imeAction = ImeAction.Done,
                             leadingIcon = {
-                                TextButton(
-                                    onClick = {
-                                        // todo: forgot password
-                                    }
-                                ) {
+                                TextButton(onClick = goToForgotPassword) {
                                     Text(
                                         text = stringResource(R.string.login_forgot_btn),
                                         color = Color.White.copy(alpha = 0.3f)

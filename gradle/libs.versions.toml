@@ -1,4 +1,5 @@
 [versions]
+accompanist-version = "0.30.1"
 activity-version = "1.8.0"
 android-gradle-plugin-version = "8.1.0"
 annotations-version = "24.0.1"
@@ -42,6 +43,7 @@ timber-version = "5.0.1"
 work-version = "2.8.1"
 
 [libraries]
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions" , version.ref = "accompanist-version" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "app-compat-version" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen" , version.ref = "splashscreen" }
 androidx-compose = { module = "androidx.activity:activity-compose" , version.ref = "activity-version" }
