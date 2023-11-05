@@ -50,6 +50,7 @@ import coil.compose.AsyncImage
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.erapp.nimblesurvey.R
+import com.erapp.nimblesurvey.data.database.entities.SurveyEntity
 import com.erapp.nimblesurvey.ui.components.BottomLoaderShimmer
 import com.erapp.nimblesurvey.ui.components.CarouselDots
 import com.erapp.nimblesurvey.ui.components.ScreenWithMessage
@@ -67,6 +68,7 @@ import kotlinx.coroutines.launch
 fun HomeScreen(
     homeScreenData: HomeScreenData,
     homeScreenState: HomeScreenState,
+    surveys: List<SurveyEntity> = emptyList(),
     onEvent: (HomeScreenEvent) -> Unit = {},
     onSurveyButtonPressed: () -> Unit = {},
     onLogout: () -> Unit = {}
@@ -74,7 +76,7 @@ fun HomeScreen(
     val pagerState = rememberPagerState(
         initialPage = 0
     ) {
-        homeScreenData.surveys.size
+        surveys.size
     }
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -117,12 +119,12 @@ fun HomeScreen(
                         HorizontalPager(
                             state = pagerState
                         ) { page ->
-                            val survey = homeScreenData.surveys.getOrNull(page)
+                            val survey = surveys.getOrNull(page)
                             CarouselCard(
-                                name = survey?.attributes?.title.orEmpty(),
-                                description = survey?.attributes?.description.orEmpty(),
-                                imageUrl = survey?.attributes?.coverImageUrl.orEmpty(),
-                                date = survey?.attributes?.createdAt.orEmpty(),
+                                name = survey?.title.orEmpty(),
+                                description = survey?.description.orEmpty(),
+                                imageUrl = survey?.coverImageUrl.orEmpty(),
+                                date = survey?.createdAt.orEmpty(),
                                 avatarUrl = homeScreenData.avatarUrl,
                                 goToDetails = onSurveyButtonPressed,
                                 openProfile = {
@@ -136,7 +138,7 @@ fun HomeScreen(
                             modifier = Modifier
                                 .align(Alignment.BottomStart)
                                 .padding(bottom = 156.dp, start = 16.dp),
-                            dotsCount = homeScreenData.surveys.size,
+                            dotsCount = surveys.size,
                             currentPage = pagerState.currentPage
                         )
                     }
@@ -343,7 +345,10 @@ fun CarouselCard(
                     .height(96.dp)
             ) {
                 Text(
+                    modifier = Modifier.fillMaxWidth(.8f),
                     text = name,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.titleLarge.copy(
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold

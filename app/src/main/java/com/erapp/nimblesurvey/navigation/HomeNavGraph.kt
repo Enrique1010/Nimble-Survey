@@ -1,6 +1,8 @@
 package com.erapp.nimblesurvey.navigation
 
+import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.navigation
@@ -21,10 +23,12 @@ fun NavGraphBuilder.homeNavGraph(
     ) {
         composable(NavigationHelper.HomeScreen) {
             val viewModel = hiltViewModel<HomeScreenViewModel>()
+            val surveys by viewModel.surveys.collectAsStateWithLifecycle()
 
             HomeScreen(
                 homeScreenData = viewModel.homeScreenData,
                 homeScreenState = viewModel.homeScreenState,
+                surveys = surveys,
                 onEvent = viewModel::onEvent,
                 onLogout = onLogout,
                 onSurveyButtonPressed = {

@@ -33,6 +33,7 @@ navigation-version = "2.7.5"
 okhttp3-version = "4.11.0"
 paging3-version = "3.2.1"
 retrofit-version = "2.9.0"
+room-version = "2.6.0"
 serialization-json-version = "1.5.1"
 serialization-plugin_version = "1.6.10"
 serialization-version = "1.5.1"
@@ -71,6 +72,12 @@ androidx-navigation-test = { module = "androidx.navigation:navigation-testing" ,
 androidx-paging3-common = { module = "androidx.paging:paging-common-ktx" , version.ref = "paging3-version" }
 androidx-paging3-compose = { module = "androidx.paging:paging-compose" , version.ref = "compose-paging3-version" }
 androidx-paging3-runtime = { module = "androidx.paging:paging-runtime" , version.ref = "paging3-version" }
+androidx-room-common = { module = "androidx.room:room-common" , version.ref = "room-version" }
+androidx-room-compiler = { module = "androidx.room:room-compiler" , version.ref = "room-version" }
+androidx-room-paging = { module = "androidx.room:room-paging" , version.ref = "room-version" }
+androidx-room-ktx = { module = "androidx.room:room-ktx" , version.ref = "room-version" }
+androidx-room-runtime = { module = "androidx.room:room-runtime" , version.ref = "room-version" }
+androidx-room-testing = { module = "androidx.room:room-testing" , version.ref = "room-version" }
 androidx-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose" , version.ref = "lifecycle-version" }
 androidx-view-model = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx" , version.ref = "lifecycle-version" }
 androidx-view-model-saved-state = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate" , version.ref = "lifecycle-version" }

@@ -7,9 +7,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.erapp.nimblesurvey.data.NimbleAuthRepository
 import com.erapp.nimblesurvey.data.NimbleSurveyRepository
+import com.erapp.nimblesurvey.data.database.entities.SurveyEntity
 import com.erapp.nimblesurvey.data.models.Survey
 import com.erapp.nimblesurvey.data.result.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,6 +27,20 @@ class HomeScreenViewModel @Inject constructor(
 
     var homeScreenData by mutableStateOf(HomeScreenData())
     var homeScreenState: HomeScreenState by mutableStateOf(HomeScreenState.Loading)
+
+    val surveys: StateFlow<List<SurveyEntity>> = surveyRepository.getSurveys()
+        .onEach {
+            homeScreenState = if (it.isEmpty()) {
+                HomeScreenState.Empty
+            } else {
+                HomeScreenState.Success
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+        )
 
     init {
         getUserProfile()
@@ -43,7 +63,8 @@ class HomeScreenViewModel @Inject constructor(
 
     private fun getSurveys() {
         viewModelScope.launch {
-            when(val result = surveyRepository.getSurveys()) {
+            surveyRepository.getSurveysFromNetwork()
+            /*when(val result = surveyRepository.getSurveysFromNetwork()) {
                 Result.Loading -> Unit
                 is Result.Error -> {
                     homeScreenState = HomeScreenState.Error(result.message.orEmpty())
@@ -56,7 +77,7 @@ class HomeScreenViewModel @Inject constructor(
                         homeScreenData = homeScreenData.copy(surveys = result.data.orEmpty())
                     }
                 }
-            }
+            }*/
         }
     }
 
@@ -80,6 +101,6 @@ class HomeScreenViewModel @Inject constructor(
     data class HomeScreenData(
         val userName: String = "",
         val avatarUrl: String = "",
-        val surveys: List<Survey> = emptyList()
+        //val surveys: List<Survey> = emptyList()
     )
 }

@@ -130,6 +130,14 @@ dependencies {
     implementation(libs.retrofit.converter.gson)
     implementation(libs.retrofit.converter.scalars)
 
+    // Room
+    implementation(libs.androidx.room.common)
+    implementation(libs.androidx.room.paging)
+    kapt(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+    testImplementation(libs.androidx.room.testing)
+    implementation(libs.androidx.room.runtime)
+
     // Gson
     api(libs.gson)
 
