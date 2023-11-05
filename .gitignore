@@ -18,7 +18,7 @@ build/
 local.properties
 
 # gradle configuration
-/gradle.properties
+gradle.properties
 
 # Eclipse project files
 .classpath
