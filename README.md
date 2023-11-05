@@ -36,6 +36,17 @@ App to browse between interesting surveys. Made with android jetpack compose.
   - Implement the caching of surveys onto the device. ✓
   - Implement a pull-to-refresh action to update the list of surveys. Show a loading animation when refreshing the list of surveys. ✓
 
+# Build Apk
+- To build .apk add to your gradle.properties following lines:
+
+   ```kotlin
+   nimbleKey="<NIMBLE_KEY>"
+   nimbleSecret="<NIMBLE_SECRET>"
+   nimbleBaseUrl="<NIMBLE_BASE_URL>"
+   nimbleBiometricKey="<NIMBLE_BIOMETRIC_KEY>"
+   dataStoreKey="<NIMBLE_DATA_STORE_KEY>"
+   ```
+
 # Non-native libraries used
 
 - [Retrofit 2](https://square.github.io/retrofit/) To better handle API calls.
@@ -67,7 +78,7 @@ In order for them to appear again with the app in use, they must be granted from
 
 # Video App Demo
 
-- [Application Video Demonstration]([https://drive.google.com/file/d/1TnpVVZm5oZAsKtQGHQzPOiPqIpRHArQa/view?usp=share_link](https://drive.google.com/file/d/1DzRyzBWYdwWkWbmvMyE2Ydfmi34Ft8po/view?usp=sharing)https://drive.google.com/file/d/1DzRyzBWYdwWkWbmvMyE2Ydfmi34Ft8po/view?usp=sharing)
+- [Application Video Demonstration](https://drive.google.com/file/d/1DzRyzBWYdwWkWbmvMyE2Ydfmi34Ft8po/view?usp=sharing)
 
 ## License
 
